@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Termo Intelbras - Modulare+ e Conecta+</title>
+
+<style>
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background:#121213;
+    color:white;
+    text-align:center;
+    margin:0;
+}
+
+header{
+    padding:15px;
+    border-bottom:1px solid #3a3a3c;
+}
+
+h1{
+    margin:0;
+}
+
+.subtitulo{
+    color:#bdbdbd;
+    font-size:14px;
+}
+
+#dica{
+    margin:15px;
+    font-size:15px;
+    color:#ffd54f;
+}
+
+#board{
+    display:grid;
+    grid-template-rows:repeat(6,1fr);
+    gap:5px;
+    width:max-content;
+    margin:20px auto;
+}
+
+.row{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:5px;
+}
+
+.cell{
+    width:60px;
+    height:60px;
+    border:2px solid #3a3a3c;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:28px;
+    font-weight:bold;
+    text-transform:uppercase;
+}
+
+.correct{
+    background:#6aaa64;
+    border-color:#6aaa64;
+}
+
+.present{
+    background:#c9b458;
+    border-color:#c9b458;
+}
+
+.absent{
+    background:#3a3a3c;
+    border-color:#3a3a3c;
+}
+
+#keyboard{
+    width:95%;
+    max-width:600px;
+    margin:20px auto;
+}
+
+.keyrow{
+    display:flex;
+    justify-content:center;
+    margin-bottom:8px;
+}
+
+.key{
+    margin:2px;
+    min-width:42px;
+    height:55px;
+    border:none;
+    border-radius:4px;
+    background:#818384;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.big{
+    min-width:80px;
+}
+
+#mensagem{
+    font-size:18px;
+    font-weight:bold;
+    margin:15px;
+}
+
+#contador{
+    color:#afafaf;
+    margin-bottom:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>TERMO INTELBRAS</h1>
+<div class="subtitulo">
+Modulare+ e Conecta+
+</div>
+</header>
+
+<div id="dica"></div>
+<div id="contador"></div>
+
+<div id="board"></div>
+
+<div id="mensagem"></div>
+
+<div id="keyboard"></div>
+
+<script>
+
+const banco = [
+{palavra:"RAMAL", dica:"Extensão interna da central"},
+{palavra:"LINHA", dica:"Acesso para chamadas externas"},
+{palavra:"SENHA", dica:"Usada para autenticação"},
+{palavra:"FLASH", dica:"Função telefônica utilizada em transferências"},
+{palavra:"GRUPO", dica:"Conjunto de ramais"},
+{palavra:"RESET", dica:"Retorno às configurações"},
+{palavra:"PORTA", dica:"Interface física de conexão"},
+{palavra:"CABOS", dica:"Interligação dos equipamentos"},
+{palavra:"TOQUE", dica:"Sinalização de chamada"},
+{palavra:"AUDIO", dica:"Relacionado à voz"},
+{palavra:"ROTAS", dica:"Direcionamento de chamadas"},
+{palavra:"FALHA", dica:"Problema identificado"},
+{palavra:"CHAVE", dica:"Elemento de comando"},
+{palavra:"DISCA", dica:"Ação de telefonar"},
+{palavra:"DECTS", dica:"Tecnologia de telefonia sem fio"},
+{palavra:"SIGAM", dica:"Encaminhamento de chamadas"},
+{palavra:"TRAVA", dica:"Bloqueio operacional"},
+{palavra:"TEMPO", dica:"Parâmetro programável"},
+{palavra:"CHAMA", dica:"Ligação telefônica"},
+{palavra:"TECLA", dica:"Botão de operação"},
+{palavra:"USUAR", dica:"Pessoa cadastrada"},
+{palavra:"MONIT", dica:"Acompanhamento de eventos"},
+{palavra:"ALARM", dica:"Indicação de evento crítico"},
+{palavra:"BLOCO", dica:"Agrupamento lógico"},
+{palavra:"RINGE", dica:"Sinalização de toque"},
+{palavra:"MODUL", dica:"Referência ao equipamento"},
+{palavra:"ATEND", dica:"Recepção de chamadas"},
+{palavra:"DESVI", dica:"Redirecionamento de chamadas"},
+{palavra:"CONFE", dica:"Ligação com vários participantes"},
+{palavra:"BILHE", dica:"Registro de chamadas"},
+{palavra:"TARIF", dica:"Controle de custos"},
+{palavra:"DIURN", dica:"Modo de operação"},
+{palavra:"NOTUR", dica:"Modo alternativo de operação"},
+{palavra:"MUSIC", dica:"Som em espera"},
+{palavra:"PREFI", dica:"Código de saída"},
+{palavra:"CAPTU", dica:"Atendimento de chamada"},
+{palavra:"RETEN", dica:"Manter em espera"},
+{palavra:"DTMFX", dica:"Sinalização multifrequencial"},
+{palavra:"FSKXX", dica:"Protocolo de identificação"},
+{palavra:"USBXX", dica:"Interface com computador"},
+{palavra:"PORTE", dica:"Relacionada ao porteiro eletrônico"},
+{palavra:"CODIG", dica:"Sequência programável"},
+{palavra:"AGENDA", dica:"Cadastro de contatos"},
+{palavra:"HOTLI", dica:"Chamada automática"},
+{palavra:"RECHA", dica:"Nova tentativa de chamada"},
+{palavra:"VOZES", dica:"Relacionado ao atendimento"},
+{palavra:"TRONC", dica:"Linha tronco"},
+{palavra:"RAMAI", dica:"Relacionado aos ramais"},
+{palavra:"DISAX", dica:"Atendimento automático"},
+{palavra:"ITA70", dica:"Modelo de terminal"}
+];
+
+const sorteio = banco[Math.floor(Math.random()*banco.length)];
+
+const palavra = sorteio.palavra;
+const dica = sorteio.dica;
+
+document.getElementById("dica").innerHTML =
+"<b>Dica:</b> " + dica;
+
+let tentativaAtual = 0;
+let letraAtual = 0;
+let jogoFinalizado = false;
+
+const board = document.getElementById("board");
+
+for(let i=0;i<6;i++){
+
+    const row = document.createElement("div");
+    row.className="row";
+
+    for(let j=0;j<5;j++){
+
+        const cell = document.createElement("div");
+        cell.className="cell";
+
+        row.appendChild(cell);
+
+    }
+
+    board.appendChild(row);
+
+}
+
+function atualizarContador(){
+
+document.getElementById("contador").innerHTML =
+"Tentativa " + (tentativaAtual+1) + " de 6";
+
+}
+
+atualizarContador();
+
+const teclado = [
+["Q","W","E","R","T","Y","U","I","O","P"],
+["A","S","D","F","G","H","J","K","L"],
+["ENTER","Z","X","C","V","B","N","M","⌫"]
+];
+
+const keyboard = document.getElementById("keyboard");
+
+teclado.forEach(linha=>{
+
+const div = document.createElement("div");
+div.className="keyrow";
+
+linha.forEach(letra=>{
+
+const btn=document.createElement("button");
+
+btn.textContent=letra;
+btn.className="key";
+
+if(letra==="ENTER" || letra==="⌫")
+btn.classList.add("big");
+
+btn.onclick=()=>tecla(letra);
+
+div.appendChild(btn);
+
+});
+
+keyboard.appendChild(div);
+
+});
+
+function tecla(valor){
+
+if(jogoFinalizado) return;
+
+const row = board.children[tentativaAtual];
+
+if(valor==="⌫"){
+
+if(letraAtual>0){
+
+letraAtual--;
+row.children[letraAtual].textContent="";
+
+}
+
+return;
+}
+
+if(valor==="ENTER"){
+
+if(letraAtual!==5) return;
+
+verificar();
+return;
+
+}
+
+if(letraAtual<5){
+
+row.children[letraAtual].textContent=valor;
+letraAtual++;
+
+}
+
+}
+
+function verificar(){
+
+const row = board.children[tentativaAtual];
+
+let tentativa="";
+
+for(let i=0;i<5;i++){
+
+tentativa += row.children[i].textContent;
+
+}
+
+for(let i=0;i<5;i++){
+
+const letra = tentativa[i];
+
+if(letra===palavra[i]){
+
+row.children[i].classList.add("correct");
+
+}else if(palavra.includes(letra)){
+
+row.children[i].classList.add("present");
+
+}else{
+
+row.children[i].classList.add("absent");
+
+}
+
+}
+
+if(tentativa===palavra){
+
+document.getElementById("mensagem").innerHTML =
+"🎉 Parabéns! Você acertou.";
+
+jogoFinalizado=true;
+return;
+
+}
+
+tentativaAtual++;
+letraAtual=0;
+
+if(tentativaAtual===6){
+
+document.getElementById("mensagem").innerHTML =
+"❌ Fim de jogo! Palavra: " + palavra;
+
+jogoFinalizado=true;
+
+}else{
+
+atualizarContador();
+
+}
+
+}
+
+document.addEventListener("keydown",(e)=>{
+
+const teclaPressionada = e.key.toUpperCase();
+
+if(teclaPressionada==="BACKSPACE") tecla("⌫");
+else if(teclaPressionada==="ENTER") tecla("ENTER");
+else if(/^[A-Z]$/.test(teclaPressionada))
+tecla(teclaPressionada);
+
+});
+
+</script>
+
+</body>
+</html>
