@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Termo Telecom</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background:#f4f4f4;
+    color:#333;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-height:100vh;
+    padding:20px;
+}
+
+h1{
+    color:#00a335;
+    margin-bottom:10px;
+}
+
+p{
+    margin-bottom:20px;
+    text-align:center;
+}
+
+.board{
+    display:grid;
+    gap:8px;
+}
+
+.row{
+    display:grid;
+    grid-template-columns:repeat(3, 70px);
+    gap:8px;
+}
+
+.cell{
+    width:70px;
+    height:70px;
+    border:2px solid #d3d6da;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:32px;
+    font-weight:bold;
+    text-transform:uppercase;
+    background:white;
+}
+
+.correct{
+    background:#6aaa64;
+    color:white;
+    border-color:#6aaa64;
+}
+
+.present{
+    background:#c9b458;
+    color:white;
+    border-color:#c9b458;
+}
+
+.absent{
+    background:#787c7e;
+    color:white;
+    border-color:#787c7e;
+}
+
+.controls{
+    margin-top:20px;
+    display:flex;
+    gap:10px;
+}
+
+input{
+    width:120px;
+    padding:10px;
+    text-align:center;
+    font-size:22px;
+    text-transform:uppercase;
+}
+
+button{
+    padding:10px 20px;
+    border:none;
+    background:#00a335;
+    color:white;
+    cursor:pointer;
+    border-radius:5px;
+    font-size:16px;
+}
+
+button:hover{
+    background:#00892d;
+}
+
+.message{
+    margin-top:20px;
+    font-size:20px;
+    font-weight:bold;
+    text-align:center;
+    min-height:30px;
+}
+
+.footer{
+    margin-top:30px;
+    max-width:700px;
+    text-align:center;
+    font-size:14px;
+    color:#666;
+}
+
+.legend{
+    display:flex;
+    gap:15px;
+    margin-top:20px;
+}
+
+.legend-item{
+    display:flex;
+    align-items:center;
+    gap:5px;
+}
+
+.color{
+    width:20px;
+    height:20px;
+    border-radius:4px;
+}
+
+.green{
+    background:#6aaa64;
+}
+
+.yellow{
+    background:#c9b458;
+}
+
+.gray{
+    background:#787c7e;
+}
+</style>
+</head>
+
+<body>
+
+<h1>📞 Termo Telecom</h1>
+
+<p>
+Descubra a sigla de telefonia em até 6 tentativas.
+</p>
+
+<div class="board" id="board"></div>
+
+<div class="controls">
+    <input
+        id="guessInput"
+        maxlength="3"
+        placeholder="SIG"
+        autocomplete="off">
+    <button onclick="submitGuess()">Enviar</button>
+</div>
+
+<div class="message" id="message"></div>
+
+<div class="legend">
+    <div class="legend-item">
+        <div class="color green"></div>
+        <span>Posição correta</span>
+    </div>
+
+    <div class="legend-item">
+        <div class="color yellow"></div>
+        <span>Existe na palavra</span>
+    </div>
+
+    <div class="legend-item">
+        <div class="color gray"></div>
+        <span>Não existe</span>
+    </div>
+</div>
+
+<div class="footer">
+    ATA, SIP, RTP, TCP, UDP, NAT, DNS, LAN, WAN, URI, ACK,
+    BYE, PRI, BRI, DDI, DDR, DID, CLI, ANI, TDM, PCM, CAS,
+    CCS, PBX, IVR, VAD, PLC, MOS, VPN, UTP, STP, MDF, IDF,
+    CDR, TOS, GSM, LTE, IMS, SIM, FXO, FXS
+</div>
+
+<script>
+
+const words = [
+    "ATA","SIP","RTP","TCP","UDP",
+    "NAT","DNS","LAN","WAN","URI",
+    "ACK","BYE","PRI","BRI","DDI",
+    "DDR","DID","CLI","ANI","TDM",
+    "PCM","CAS","CCS","PBX","IVR",
+    "VAD","PLC","MOS","VPN","UTP",
+    "STP","MDF","IDF","CDR","TOS",
+    "GSM","LTE","IMS","SIM","FXO",
+    "FXS"
+];
+
+const answer =
+    words[Math.floor(Math.random() * words.length)];
+
+let currentRow = 0;
+const maxAttempts = 6;
+
+const board = document.getElementById("board");
+
+for(let i=0; i<maxAttempts; i++){
+
+    const row = document.createElement("div");
+    row.className = "row";
+
+    for(let j=0; j<3; j++){
+
+        const cell = document.createElement("div");
+        cell.className = "cell";
+
+        row.appendChild(cell);
+    }
+
+    board.appendChild(row);
+}
+
+function submitGuess(){
+
+    if(currentRow >= maxAttempts){
+        return;
+    }
+
+    const input =
+        document.getElementById("guessInput");
+
+    const message =
+        document.getElementById("message");
+
+    const guess =
+        input.value.trim().toUpperCase();
+
+    if(guess.length !== 3){
+        message.textContent =
+            "Digite uma sigla com 3 letras.";
+        return;
+    }
+
+    if(!words.includes(guess)){
+        message.textContent =
+            "Sigla não cadastrada no jogo.";
+        return;
+    }
+
+    const row =
+        board.children[currentRow];
+
+    const cells =
+        row.children;
+
+    for(let i=0; i<3; i++){
+
+        cells[i].textContent = guess[i];
+
+        if(guess[i] === answer[i]){
+
+            cells[i].classList.add("correct");
+
+        }else if(answer.includes(guess[i])){
+
+            cells[i].classList.add("present");
+
+        }else{
+
+            cells[i].classList.add("absent");
+        }
+    }
+
+    if(guess === answer){
+
+        message.innerHTML =
+            "🏆 Parabéns! Você acertou: <b>" +
+            answer +
+            "</b>";
+
+        input.disabled = true;
+        return;
+    }
+
+    currentRow++;
+
+    if(currentRow === maxAttempts){
+
+        message.innerHTML =
+            "❌ Fim de jogo! A resposta era: <b>" +
+            answer +
+            "</b>";
+
+        input.disabled = true;
+    }
+
+    input.value = "";
+}
+
+document
+.getElementById("guessInput")
+.addEventListener("keypress", function(event){
+
+    if(event.key === "Enter"){
+
+        event.preventDefault();
+        submitGuess();
+    }
+});
+
+</script>
+
+</body>
+</html>
