@@ -1,2 +1,0 @@
-# Jogos
-Jogos Suporte Comunicação
